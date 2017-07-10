@@ -11,11 +11,11 @@ class QualityPlugin(p.SingletonPlugin):
     p.implements(p.IRoutes,inherit=True)
 
     def before_map(self, map):
-	map.connect('add dataset', '/dataset/new',controller='ckanext.quality.package:PackageController', action='new')          
+	map.connect('add dataset', '/dataset/new',controller='ckanext.quality2.package:PackageController', action='new')          
         return map
 
     def after_map(self, map):
-	map.connect('add dataset', '/dataset/new',controller='ckanext.quality.package:PackageController', action='new')          
+	map.connect('add dataset', '/dataset/new',controller='ckanext.quality2.package:PackageController', action='new')          
         return map
 
 

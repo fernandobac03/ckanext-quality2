@@ -2,7 +2,7 @@
 
 <div data-module="custom-fields" >
 {%- set values = data.get(field.field_name, [])
-    + [''] * field.get('form_blanks', 3) -%}
+    + [''] * field.get('form_blanks', 1) -%}
 {%- for element in values -%}  
 		<div id="div_quality_value" style="display">
 
