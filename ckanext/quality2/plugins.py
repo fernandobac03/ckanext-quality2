@@ -5,7 +5,7 @@ from ckanext.quality2 import validators
 
 
 
-class RepeatingPlugin(p.SingletonPlugin):
+class QualityPlugin(p.SingletonPlugin):
     p.implements(p.IValidators)
     p.implements(p.IConfigurer)
     p.implements(p.IRoutes,inherit=True)
