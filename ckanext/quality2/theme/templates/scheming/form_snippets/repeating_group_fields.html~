@@ -1,0 +1,129 @@
+{% import 'macros/form.html' as form %}
+
+<div data-module="custom-fields" >
+{%- set values = data.get(field.field_name, [])
+    + [''] * field.get('form_blanks', 3) -%}
+
+{% set fieldname_subfields = field.field_name_subfields|string %}
+{% set fieldname_subfields = fieldname_subfields | replace("u'","'")  %}
+
+{%- for element in values -%}
+<div style="padding: 5px;">
+     {% if loop.index == 1 %}
+	{% if element =='' %}
+           {% set color = "background-color: #FFFFFF;" %}
+	{% else %}
+	   {% set color = "background-color: #F5F5F5;" %}	
+	{% endif %}
+	      <div id="fields_repeating_container_{{ field.label }}_1" style="{{ color }}">
+           	{% if element == '' or values[loop.index] == '' %}
+	           <input id="button_fields_repeating_container_{{ field.label }}_1" type="button" value="Agregar {{ field.label }}" onclick="add_field_in_group({{ loop.index }}, '{{ field.label }}', {{ fieldname_subfields }} )" style="font-size: 12px; padding: 1px; float: right;"> 
+		{% endif %} 
+	
+                {{ form.input(
+	  		    field.field_name + '-' ~ loop.index,
+		    	    id='field-' + field.field_name + '-' ~ loop.index,
+			    label=h.scheming_language_text(field.label) + ' ' ~ loop.index,
+			    placeholder=h.scheming_language_text(field.form_placeholder),
+			    value=element,
+			    error=errors[field.field_name],
+			    classes=['control-medium'],
+			    attrs=field.form_attrs if 'form_attrs' in field else {},
+			    is_required=h.scheming_field_required(field)
+	         ) }}
+	     </div>
+     {% else %}
+	{% set ocultoid = loop.index|string %}
+        {% if element == '' %}
+		{% set visibilidad = "display:none;" %}
+		<div id="fields_repeating_container_{{ field.label }}_{{ ocultoid }}" style="{{ visibilidad }};">
+			{% if (loop.index < values|length ) %}
+	    			{% set buttonid = loop.index|string %}
+         		       <input id="button_fields_repeating_container_{{ field.label }}_{{ buttonid }}" type="button" value="Agregar {{ field.label }}" onclick="add_field_in_group({{ loop.index }}, '{{ field.label }}', {{ fieldname_subfields }} )" style="font-size: 12px; padding: 1px; float: right;"> 
+	        	{% endif %}
+	       		{{ form.input(
+	  		    field.field_name + '-' ~ loop.index,
+		    	    id='field-' + field.field_name + '-' ~ loop.index,
+			    label=h.scheming_language_text(field.label) + ' ' ~ loop.index,
+			    placeholder=h.scheming_language_text(field.form_placeholder),
+			    value=element,
+			    error=errors[field.field_name],
+			    classes=['control-medium'],
+			    attrs=field.form_attrs if 'form_attrs' in field else {},
+			    is_required=h.scheming_field_required(field)
+		        ) }}
+                 </div>
+
+	{% else %}
+		{% set visibilidad = "display:block;" %}
+		<div  id="fields_repeating_container_{{ field.label }}_{{ ocultoid }}" style="{{ visibilidad }};  background-color: #F5F5F5;">
+			{% if values[loop.index] == '' %}			
+			{% if (loop.index < values|length ) %}
+	    			{% set buttonid = loop.index|string %}
+         		       <input id="button_fields_repeating_container_{{ field.label }}_{{ buttonid }}" type="button" value="Agregar {{ field.label }}" onclick="add_field_in_group({{ loop.index }}, '{{ field.label }}', {{ fieldname_subfields }} )" style="font-size: 12px; padding: 1px; float: right;"> 
+			{% endif %}
+			{% endif %}
+
+	        	{{ form.input(
+  		    		    field.field_name + '-' ~ loop.index,
+			    	    id='field-' + field.field_name + '-' ~ loop.index,
+				    label=h.scheming_language_text(field.label) + ' ' ~ loop.index,
+				    placeholder=h.scheming_language_text(field.form_placeholder),
+				    value=element,
+				    error=errors[field.field_name],
+				    classes=['control-medium'],
+				    attrs=field.form_attrs if 'form_attrs' in field else {},
+				    is_required=h.scheming_field_required(field)
+		        ) }}
+                </div>
+	{% endif %}	    
+ {% endif %}	
+</div>
+{%- endfor -%}
+ <input id="auxButton" type="button" value="agrupar" onclick="grouping({{ values|length }}, '{{ field.label }}', {{ fieldname_subfields }} )" style="font-size: 12px; padding: 1px; float: right; display:none;"> 
+
+</div>
+
+{% resource 'ckanext-repeating/main' %}
+
+
+
+<script>
+var auxButton = document.getElementById('auxButton');
+if(auxButton){
+	auxButton.click();
+}
+function grouping(num_elements,label,subfields)
+{
+	for (i = 0; i < num_elements; i++) {
+		var index = i+1;
+		var elementid = 'fields_repeating_container_'+label+'_'+index;
+		var group_fields_div = document.getElementById(elementid);
+		if (group_fields_div)
+		{
+			for (j = 0; j < subfields.length; j++) {
+				var subfieldId='fields_repeating_container_'+subfields[j]+'_'+index;
+				var subfield = document.getElementById(subfieldId);
+				if (subfield)
+				{
+					group_fields_div.appendChild(subfield);
+					/***Esta condicion es para saber si ya no se han creado mas campos y subcampos, para cambiar de ID al 						boton auxButton que es el que agrupa a los subcampos, se realiza esta condicion, pues que cada vez que 						se crea un subcampo (se llama a esta funcion)**/
+					var elementidaux = 'fields_repeating_container_'+label+'_'+(index+1);
+					var elementidauxdiv=document.getElementById(elementidaux);
+					/**Si no existe el siguiente elemento principal (Group) y si el subcampo actual es el ultimo de los 						subcampos**/
+					if (!elementidauxdiv && j==(subfields.length-1))
+					{
+						var auxButton = document.getElementById('auxButton');
+						if(auxButton){
+							auxButton.id="auxButtonold";
+						}
+					}
+				}
+			}
+		}	
+	}
+}
+</script>
+
+
+

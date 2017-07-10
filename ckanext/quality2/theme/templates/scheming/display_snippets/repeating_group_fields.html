@@ -1,0 +1,69 @@
+{%- set values = data[field.field_name] -%}
+
+{% set fieldname_subfields = field.field_name_subfields|string %}
+{% set fieldname_subfields_to_js = fieldname_subfields | replace("u'","'")  %}
+{% set fieldname_subfields = fieldname_subfields | replace("u'","'") | replace("'","") | replace("[","") | replace("]","") | replace(" ","")  %}
+
+{% set fieldlabel_subfields = field.field_label_subfields|string %}
+{% set fieldlabel_subfields_to_js = fieldlabel_subfields | replace("u'","'")  %}
+{% set fieldlabel_subfields = fieldlabel_subfields | replace("u'","'") | replace("'","") | replace("[","") | replace("]","") | replace(" ","")  %}
+
+
+<ol>
+{%- for element in values -%}
+	<div style="padding: 10px">
+		<div id="fields_repeating_container_{{ field.field_name }}_{{ loop.index}}" style="background-color: #F5F5F5">
+			<li>{{ element }}</li>
+		</div>
+	</div>
+{%- endfor -%}
+<input type="button" id="auxButton" onclick="grouping({{ values|length }}, '{{ field.field_name }}', {{ fieldname_subfields_to_js }} )" style="display:none;">  
+</ol>
+
+{%- set fieldsnamelist = fieldname_subfields.split(',') -%}
+{%- set fieldslabellist = fieldlabel_subfields.split(',') -%}
+{%- for field in fieldsnamelist -%}
+{% set currentloopfield = loop.index %}
+{% set field =  field | replace(" ","") %}
+	{%- set fieldvalues = data[field] -%}
+	{% if fieldvalues %}
+		{%- for val in fieldvalues -%}
+			<div id="fields_repeating_container_{{ field }}_{{ loop.index}}">  
+				{% set label = fieldslabellist[currentloopfield -1] %}			  	
+				<span style="width: 10%">{{  label }}: </span> <span>{{ val }}</span>
+			</div>
+		{%- endfor -%}
+	{% else %}
+		 <!--<li>no data in fieldvalues</li>-->
+	{% endif %}
+{%- endfor -%}
+
+
+<script>
+
+var auxButton = document.getElementById('auxButton');
+	if(auxButton){
+		auxButton.click();
+		auxButton.id="auxButtonold"
+        }
+
+function grouping(num_elements,label,subfields)
+{
+	for (i = 0; i < num_elements; i++) {
+		var index = i+1;
+		var elementid = 'fields_repeating_container_'+label+'_'+index;
+		var group_fields_div = document.getElementById(elementid);
+		if (group_fields_div)	
+		{	
+			for (j = 0; j < subfields.length; j++) {
+				var subfieldId='fields_repeating_container_'+subfields[j]+'_'+index;
+				var subfield = document.getElementById(subfieldId);
+				if (subfield)
+				{
+					group_fields_div.appendChild(subfield);
+				}
+			}
+		}
+	}
+}
+</script>

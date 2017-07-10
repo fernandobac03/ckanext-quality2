@@ -1,0 +1,5 @@
+recursive-include ckanext *.html *.json *.yaml
+recursive-include    ckanext/quality2/theme/templates                            *
+recursive-include    ckanext/quality2/theme/public                               *
+recursive-include    ckanext/quality2 *.html *.json *.js *.less *.css
+
